@@ -1,39 +1,10 @@
 package base32
 
 object Base32 extends Encoder with Decoder {
-  val table = Map[Int, Char](
-    0 -> 'A',
-    1 -> 'B',
-    2 -> 'C',
-    3 -> 'D',
-    4 -> 'E',
-    5 -> 'F',
-    6 -> 'G',
-    7 -> 'H',
-    8 -> 'I',
-    9 -> 'J',
-    10 -> 'K',
-    11 -> 'L',
-    12 -> 'M',
-    13 -> 'N',
-    14 -> 'O',
-    15 -> 'P',
-    16 -> 'Q',
-    17 -> 'R',
-    18 -> 'S',
-    19 -> 'T',
-    20 -> 'U',
-    21 -> 'V',
-    22 -> 'W',
-    23 -> 'X',
-    24 -> 'Y',
-    25 -> 'Z',
-    26 -> '2',
-    27 -> '3',
-    28 -> '4',
-    29 -> '5',
-    30 -> '6',
-    31 -> '7'
+  val table = List(
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '2', '3', '4', '5',
+    '6', '7'
   )
   def encode(str: String): String = {
     var res = ""
@@ -41,16 +12,32 @@ object Base32 extends Encoder with Decoder {
       .map(b => "%8s".format(b.toBinaryString).replace(' ', '0'))
       .mkString
     while (binary != "") {
-      res = res + table(Integer.parseInt("%-5s".format(binary.take(5)).replace(' ', '0'), 2))
+      res = res + table(
+        Integer.parseInt("%-5s".format(binary.take(5)).replace(' ', '0'), 2))
       binary = binary.drop(5)
     }
     res.size % 8 match {
       case 0 => res
-      case _ => res.padTo(res.size + (8- (res.size%8)), pad)
+      case _ => res.padTo(res.size + (8 - (res.size % 8)), pad)
     }
   }
 
-  def decode(): String = ""
+  def decode(str: String): String = {
+    var res = ""
+    var binary = str
+      .filter(ch => ch != '=')
+      .map(c => table.indexOf(c))
+      .map(i => i.toBinaryString)
+      .map(s => "%5s".format(s))
+      .map(s => s.replace(' ', '0'))
+      .mkString
+
+    while (binary.size >= 8) {
+      res = res + Integer.parseInt(binary.take(8), 2).toChar
+      binary = binary.drop(8)
+    }
+    return res
+  }
 }
 
 trait Encoder {
@@ -60,5 +47,5 @@ trait Encoder {
 }
 
 trait Decoder {
-  def decode(): String
+  def decode(str: String): String
 }

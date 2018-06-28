@@ -2,7 +2,7 @@ package base32
 
 import org.scalatest._
 
-class Base32Spec extends FlatSpec {
+class Base32EncodeSpec extends FlatSpec {
   "String \"ABC\"" should "encode \"IFBEG===\"" in {
     assert(Base32.encode("ABC") == "IFBEG===")
   }
@@ -13,6 +13,20 @@ class Base32Spec extends FlatSpec {
   "String \"あ\"" should "encode \"4OAYE===\"" in {
     val result = Base32.encode("あ")
     assert(result == "4OAYE===")
+  }
+}
+
+class Base32DecodeSpec extends FlatSpec {
+  "String \"IFBEG===\"" should "decode \"ABC\"" in {
+    assert(Base32.decode("IFBEG===") == "ABC")
+  }
+  "String \"FAUV4W25HIXCYIZCPN6SUK3AIASCKJRIFE======\"" should "decode \"()^[]:.,#\"{}*+`@$%&()\"" in {
+    val result = Base32.decode("FAUV4W25HIXCYIZCPN6SUK3AIASCKJRIFE======")
+    assert(result == "()^[]:.,#\"{}*+`@$%&()")
+  }
+  "String \"4OAYE===\"" should "decode \"あ\"" in {
+    val result = Base32.decode("4OAYE===")
+    assert(result == "あ")
   }
 }
 
